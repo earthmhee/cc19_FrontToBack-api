@@ -65,7 +65,7 @@ app.listen(PORT, () => console.log(`Server is running at ${PORT}`));
 
 ```
 
-## Step 7 Create route
+## Step 7 Create Auth route
 Create folder route
 -> create auth-route.js
 ```js
@@ -244,4 +244,79 @@ exports.login = (req, res, next) => {
 };
 ```
 
+## Step 11 User route
 
+```js
+const express = require("express");
+const userRouter = express.Router();
+const userController = require("../controller/user-controller");
+
+// @ENDPOINT http://localhost:8001/api/users
+userRouter.get("/users", userController.listUsers);
+userRouter.patch("/user/update-role", userController.updateRole);
+userRouter.delete("/user/:id", userController.deleteUser);
+
+module.exports = userRouter;
+```
+added user router into index.js
+```js
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const authRouter = require("./routes/auth-route");
+const { errorMiddleware } = require("./middleware/error");
+const userRouter = require("./routes/user-route");
+const app = express();
+
+//Middlewares
+app.use(cors()); // allow cross domain
+app.use(morgan("dev")); //show log terminal
+app.use(express.json())
+
+//Routing
+app.use("/api", authRouter)
+app.use("/api", userRouter)
+
+//Handle error
+app.use(errorMiddleware)
+//Start Server
+const PORT = 8001;
+app.listen(PORT, () => console.log(`Server is running at ${PORT}`));
+```
+
+## Step 12 Create user controller
+controller/user-controller.js
+```js
+// 1. list all user
+// 2. Update role
+// 3. delete user
+
+const prisma = require("../configs/prisma");
+
+exports.listUsers = async (req, res, next) => {
+  try {
+    const lists = prisma.profile.findMany({
+      data: {},
+    });
+    res.json({ message: "Lists of users" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateRole = async (req, res, next) => {
+  try {
+    res.json({ message: "Update the role of user" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteUser = async (req, res, next) => {
+  try {
+    res.json({ message: "Delete user!" });
+  } catch (error) {
+    next(error);
+  }
+};
+```
