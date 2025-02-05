@@ -3,6 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const authRouter = require("./routes/auth-route");
 const { errorMiddleware } = require("./middleware/error");
+const userRouter = require("./routes/user-route");
 const app = express();
 
 //Middlewares
@@ -12,6 +13,7 @@ app.use(express.json())
 
 //Routing
 app.use("/api", authRouter)
+app.use("/api", userRouter)
 
 //Handle error
 app.use(errorMiddleware)
